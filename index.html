@@ -1,0 +1,1740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RCCIITGV | Systematic Alpha. Indian Markets.</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+/* CSS Reset & Variables */
+:root {
+    --bg-darker: #0d1117;
+    --side-nav: #161b22;
+    --panel-bg: #1c2128;
+    --border-color: #30363d;
+    --accent-gold: #e2b714;
+    --text-main: #c9d1d9;
+    --text-muted: #8b949e;
+    --positive: #3fb950;
+    --negative: #f85149;
+    --warning: #d29922;
+    
+    /* Sectors */
+    --sector-it: #33b3ae;
+    --sector-bank: #d29922;
+    --sector-fmcg: #8957e5;
+    --sector-auto: #c586c0;
+    --sector-energy: #e34c26;
+    --sector-pharma: #e36209;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { 
+    font-family: 'Inter', sans-serif; 
+    background-color: var(--bg-darker); 
+    color: var(--text-main);
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 260px;
+    background-color: var(--side-nav);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+}
+
+.logo-area {
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.logo-icon {
+    width: 32px; height: 32px;
+    background-color: var(--accent-gold);
+    color: var(--bg-darker);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 18px;
+}
+.logo-text { font-size: 14px; font-weight: 700; color: #fff; letter-spacing: 1px;}
+.logo-subtext { font-size: 10px; color: var(--text-muted); }
+
+.nav-menu { flex: 1; padding: 16px 0; overflow-y: auto; }
+.nav-item {
+    display: flex; align-items: center;
+    padding: 12px 24px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    border-left: 3px solid transparent;
+    transition: all 0.2s ease;
+}
+.nav-item:hover { background-color: rgba(255,255,255,0.05); color: var(--text-main); }
+.nav-item.active {
+    background-color: rgba(226, 183, 20, 0.1);
+    color: var(--accent-gold);
+    border-left-color: var(--accent-gold);
+}
+.nav-icon { width: 20px; margin-right: 12px; font-size: 16px;}
+
+.disclaimerBox {
+    padding: 24px; font-size: 10px;
+    color: var(--text-muted); opacity: 0.6;
+    border-top: 1px solid var(--border-color);
+}
+
+/* Main Content */
+.main-content {
+    flex: 1; display: flex; flex-direction: column;
+    overflow: hidden;
+}
+.top-header {
+    height: 70px; padding: 0 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--border-color);
+    background-color: var(--bg-darker);
+}
+.top-header h2 { font-size: 20px; font-weight: 600; color: #fff;}
+
+.btn {
+    padding: 8px 16px; border-radius: 6px;
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    border: 1px solid transparent; transition: all 0.2s ease;
+}
+.btn-secondary { background: var(--panel-bg); color: var(--text-main); border-color: var(--border-color); }
+.btn-secondary:hover { border-color: var(--text-muted); }
+.btn-primary { background: var(--accent-gold); color: var(--bg-darker); }
+.btn-primary:hover { opacity: 0.9; }
+
+/* Screens View */
+.screen-content {
+    flex: 1; padding: 32px; overflow-y: auto;
+    display: none;
+}
+.screen-content.active { display: block; }
+
+/* Fund Overview Dashboard */
+.kpi-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px; margin-bottom: 24px;
+}
+.kpi-card {
+    background: var(--panel-bg); border: 1px solid var(--border-color);
+    border-radius: 12px; padding: 20px;
+}
+.kpi-label { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;}
+.kpi-value { font-size: 28px; font-weight: 700; margin: 8px 0 4px 0; color: #fff;}
+.kpi-value.positive { color: var(--positive); }
+.kpi-value.negative { color: var(--negative); }
+.kpi-subtext { font-size: 12px; color: var(--text-muted); }
+
+.dashboard-panel {
+    background: var(--panel-bg); border: 1px solid var(--border-color);
+    border-radius: 12px; padding: 20px; margin-bottom: 24px;
+}
+.panel-title { font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 16px;}
+
+.activity-feed, .alerts-container { max-height: 250px; overflow-y: auto; }
+.feed-item {
+    padding: 12px 0; border-bottom: 1px solid var(--border-color);
+    display: flex; align-items: flex-start; gap: 12px;
+}
+.feed-item:last-child { border-bottom: none; }
+.feed-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-gold); margin-top: 6px;}
+.feed-dot.info { background: #58a6ff; }
+.feed-text { font-size: 13px; color: var(--text-main); }
+.feed-time { font-size: 11px; color: var(--text-muted); margin-top: 4px;}
+
+.alert-item {
+    background: rgba(248, 81, 73, 0.1); border: 1px solid rgba(248, 81, 73, 0.2);
+    padding: 12px; border-radius: 6px; margin-bottom: 12px;
+    display: flex; gap: 12px; align-items: center;
+}
+.alert-icon { color: var(--negative); }
+.alert-text { font-size: 13px; }
+
+.signal-dist-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+}
+.dist-box {
+    background: var(--bg-darker); border: 1px solid var(--border-color);
+    border-radius: 8px; padding: 16px; text-align: center;
+}
+.dist-val { font-size: 24px; font-weight: 700; color: #fff;}
+.dist-lbl { font-size: 11px; color: var(--text-muted); margin-top: 4px; text-transform: uppercase;}
+
+.top-opp-table { width: 100%; border-collapse: collapse; }
+.top-opp-table th { text-align: left; font-size: 12px; color: var(--text-muted); padding: 8px 12px; border-bottom: 1px solid var(--border-color);}
+.top-opp-table td { padding: 12px; font-size: 13px; border-bottom: 1px solid var(--border-color);}
+
+/* Signal Engine View */
+.filters-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; gap: 16px; flex-wrap: wrap;}
+.sector-filters { display: flex; gap: 8px; flex-wrap: wrap; }
+.filter-btn {
+    background: transparent; border: 1px solid var(--border-color);
+    color: var(--text-muted); padding: 6px 14px; border-radius: 20px;
+    font-size: 12px; cursor: pointer; transition: all 0.2s;
+}
+.filter-btn:hover { border-color: var(--text-main); color: var(--text-main); }
+.filter-btn.active { border-color: var(--accent-gold); color: var(--accent-gold); }
+
+.stocks-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;
+}
+.stock-card {
+    background: var(--panel-bg); border: 1px solid var(--border-color);
+    border-radius: 12px; padding: 16px;
+    cursor: pointer; transition: transform 0.2s ease, border-color 0.2s ease;
+}
+.stock-card:hover { transform: translateY(-2px); border-color: #58a6ff; }
+.card-top { display: flex; justify-content: space-between; margin-bottom: 4px;}
+.ticker { font-weight: 700; color: #fff; font-size: 16px;}
+.price { font-weight: 600; font-size: 15px;}
+.name-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 16px;}
+
+.mini-chart { height: 40px; width: 100%; margin-bottom: 16px;}
+
+.metrics-row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 12px; align-items: center;}
+.sector-badge { padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; background: rgba(255,255,255,0.05); }
+
+.score-bar-container { margin-bottom: 8px;}
+.score-flex { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px; color: var(--text-muted);}
+.score-track { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden;}
+.score-fill { height: 100%; border-radius: 2px; }
+
+.card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border-color);}
+.signal-badge { font-size: 10px; font-weight: 700; padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border-color);}
+.signal-badge.conviction { border-color: var(--positive); color: var(--positive); background: rgba(63, 185, 80, 0.1);}
+.total-alpha { font-size: 20px; font-weight: 800; color: var(--accent-gold);}
+
+/* Forms */
+.settings-form label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 8px; }
+.settings-form input {
+    width: 300px; padding: 10px 12px; background: var(--bg-darker);
+    border: 1px solid var(--border-color); color: #fff;
+    border-radius: 6px; margin-bottom: 16px; font-family: monospace;
+}
+
+/* Drawer */
+.right-drawer {
+    position: fixed; top: 0; right: -500px; width: 450px; height: 100vh;
+    background: var(--panel-bg); border-left: 1px solid var(--border-color);
+    box-shadow: -5px 0 25px rgba(0,0,0,0.5); z-index: 200;
+    transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex; flex-direction: column;
+}
+.right-drawer.open { right: 0; }
+.drawer-header {
+    padding: 24px; border-bottom: 1px solid var(--border-color);
+    display: flex; justify-content: space-between; align-items: center;
+}
+.drawer-header h3 { font-size: 18px; color: #fff;}
+.close-drawer { background: none; border: none; color: var(--text-muted); font-size: 24px; cursor: pointer;}
+.drawer-content { flex: 1; overflow-y: auto; padding: 24px;}
+
+.drawer-overlay {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.5); z-index: 150; display: none; opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.drawer-overlay.open { display: block; opacity: 1; }
+
+.drawer-section { margin-top: 24px; }
+.drawer-section h4 { font-size: 14px; margin-bottom: 12px; color: var(--text-muted); border-bottom: 1px solid var(--border-color); padding-bottom: 8px;}
+.drawer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.metric-box { background: var(--bg-darker); padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);}
+.metric-box label { font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px;}
+.metric-box val { font-size: 15px; font-weight: 600; color: #fff; }
+
+.ai-content-box {
+    background: rgba(226, 183, 20, 0.05); border: 1px solid rgba(226, 183, 20, 0.2);
+    border-radius: 8px; padding: 16px; font-size: 13px; line-height: 1.6; color: var(--text-main);
+}
+.skeleton-text { height: 12px; background: rgba(255,255,255,0.05); border-radius: 4px; margin-bottom: 8px; width: 100%; animation: pulse 1.5s infinite;}
+.skeleton-text.short { width: 60%; }
+@keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 0.3; } 100% { opacity: 0.6; } }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #424a53; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #5a6571; }
+
+/* Dashboard Grid Fix */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 20px;
+}
+.panel-signal-dist { grid-column: 1; grid-row: 1; }
+.panel-top-opp    { grid-column: 2; grid-row: 1 / span 2; }
+.panel-activity   { grid-column: 1; grid-row: 2; }
+.panel-alerts     { grid-column: 1 / span 2; }
+
+/* AI Intelligence Desk */
+.ai-desk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+.mood-indicator { display: flex; align-items: center; gap: 16px; padding: 20px; }
+.mood-badge { font-size: 32px; font-weight: 800; }
+.mood-label { font-size: 13px; color: var(--text-muted); }
+.thematic-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.theme-card {
+    background: var(--panel-bg); border: 1px solid var(--border-color);
+    border-radius: 12px; padding: 20px; cursor: pointer;
+    transition: transform 0.2s, border-color 0.2s;
+}
+.theme-card:hover { transform: translateY(-2px); border-color: var(--accent-gold); }
+.theme-icon { font-size: 28px; margin-bottom: 8px; }
+.theme-name { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+.theme-desc { font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+.theme-return { font-size: 13px; font-weight: 600; margin-top: 8px; }
+
+/* Portfolio Screen */
+.portfolio-kpi-strip { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+.pkpi { background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px 24px; flex: 1; min-width: 140px; }
+.pkpi-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.pkpi-val { font-size: 22px; font-weight: 700; color: #fff; margin-top: 4px; }
+.portfolio-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+.holdings-table { width: 100%; border-collapse: collapse; }
+.holdings-table th { font-size: 11px; color: var(--text-muted); text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--border-color); text-transform: uppercase; }
+.holdings-table td { padding: 12px; font-size: 13px; border-bottom: 1px solid rgba(48,54,61,0.5); vertical-align: middle; }
+.holdings-table tr:hover { background: rgba(255,255,255,0.02); }
+.add-stock-form { display: flex; gap: 8px; margin-bottom: 20px; align-items: center; }
+.add-stock-form select, .add-stock-form input {
+    background: var(--bg-darker); border: 1px solid var(--border-color); color: #fff;
+    padding: 8px 12px; border-radius: 6px; font-size: 13px;
+}
+
+/* Risk Desk */
+.risk-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 24px; }
+.risk-meter { background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; }
+.risk-meter-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+.risk-gauge { width: 80px; height: 80px; border-radius: 50%; border: 6px solid var(--border-color); margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 800; }
+.risk-gauge.low { border-color: var(--positive); color: var(--positive); }
+.risk-gauge.medium { border-color: var(--warning); color: var(--warning); }
+.risk-gauge.high { border-color: var(--negative); color: var(--negative); }
+.corr-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.corr-table th, .corr-table td { padding: 8px 10px; text-align: center; border: 1px solid var(--border-color); }
+.corr-table th { background: var(--bg-darker); color: var(--text-muted); font-weight: 600; }
+.corr-cell-high { background: rgba(248,81,73,0.25); color: var(--negative); font-weight: 600; }
+.corr-cell-med  { background: rgba(210,153,34,0.15); color: var(--warning); }
+.corr-cell-low  { background: rgba(63,185,80,0.1);  color: var(--positive); }
+
+/* Research Screen */
+.research-layout { display: grid; grid-template-columns: 280px 1fr; gap: 20px; height: calc(100vh - 160px); overflow: hidden; }
+.research-list { overflow-y: auto; background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 8px; }
+.research-stock-item { padding: 12px 16px; border-radius: 8px; cursor: pointer; transition: background 0.2s; display: flex; justify-content: space-between; align-items: center; }
+.research-stock-item:hover { background: rgba(255,255,255,0.05); }
+.research-stock-item.active { background: rgba(226,183,20,0.1); border-left: 3px solid var(--accent-gold); }
+.research-report { overflow-y: auto; background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 28px; }
+.report-header { border-bottom: 1px solid var(--border-color); padding-bottom: 16px; margin-bottom: 20px; }
+.report-ticker { font-size: 28px; font-weight: 800; color: #fff; }
+.report-name { font-size: 14px; color: var(--text-muted); }
+.report-section { margin-bottom: 20px; }
+.report-section h4 { font-size: 13px; text-transform: uppercase; color: var(--accent-gold); letter-spacing: 1px; margin-bottom: 8px; }
+.report-section p { font-size: 13px; line-height: 1.7; color: var(--text-main); }
+.report-score-strip { display: flex; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+.rscore { background: var(--bg-darker); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 20px; text-align: center; }
+.rscore-val { font-size: 24px; font-weight: 800; }
+.rscore-lbl { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+/* Backtest Screen */
+.backtest-layout { display: grid; grid-template-columns: 300px 1fr; gap: 20px; }
+.backtest-params { background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+.param-group { margin-bottom: 16px; }
+.param-group label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
+.param-group input, .param-group select {
+    width: 100%; background: var(--bg-darker); border: 1px solid var(--border-color);
+    color: #fff; padding: 8px 12px; border-radius: 6px; font-size: 13px;
+}
+.backtest-results { display: flex; flex-direction: column; gap: 20px; }
+.perf-strip { display: flex; gap: 12px; flex-wrap: wrap; }
+.perf-kpi { background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px 20px; flex: 1; min-width: 120px; }
+.perf-kpi-val { font-size: 22px; font-weight: 700; }
+.perf-kpi-lbl { font-size: 11px; color: var(--text-muted); }
+.trade-log-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.trade-log-table th { background: var(--bg-darker); color: var(--text-muted); padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border-color); }
+.trade-log-table td { padding: 8px 12px; border-bottom: 1px solid rgba(48,54,61,0.5); }
+.win { color: var(--positive); }
+.loss { color: var(--negative); }
+
+.placeholder-text { padding: 40px; color: var(--text-muted); font-size: 16px; }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="logo-area">
+            <div class="logo-icon">A</div>
+            <div>
+                <h1 class="logo-text">RCCIITGV</h1>
+                <p class="logo-subtext">Systematic Alpha. Indian Markets.</p>
+            </div>
+        </div>
+
+        <nav class="nav-menu">
+            <a href="#" class="nav-item active" data-target="fund-overview">
+                <span class="nav-icon">📈</span> Fund Overview
+            </a>
+            <a href="#" class="nav-item" data-target="ai-intelligence">
+                <span class="nav-icon">📡</span> AI Intelligence
+            </a>
+            <a href="#" class="nav-item" data-target="signal-engine">
+                <span class="nav-icon">📊</span> Signal Engine
+            </a>
+            <a href="#" class="nav-item" data-target="portfolio">
+                <span class="nav-icon">💼</span> Portfolio
+            </a>
+            <a href="#" class="nav-item" data-target="risk-desk">
+                <span class="nav-icon">⚠️</span> Risk Desk
+            </a>
+            <a href="#" class="nav-item" data-target="research">
+                <span class="nav-icon">🔬</span> Research
+            </a>
+            <a href="#" class="nav-item" data-target="backtest">
+                <span class="nav-icon">📉</span> Backtest
+            </a>
+            <a href="#" class="nav-item" data-target="settings">
+                <span class="nav-icon">⚙️</span> Settings
+            </a>
+        </nav>
+
+        <div class="disclaimerBox">
+            Simulated for educational purposes only.<br>
+            Not SEBI registered. Not investment advice.
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="main-content">
+        <!-- HEADER -->
+        <header class="top-header">
+            <h2 id="page-title">Fund Overview</h2>
+            <div class="header-actions">
+                <button class="btn btn-secondary" onclick="app.refreshData()">
+                    <span>🔄</span> Refresh
+                </button>
+            </div>
+        </header>
+
+        <!-- SCREEN: FUND OVERVIEW -->
+        <section id="fund-overview" class="screen-content active">
+            <!-- KPI CARDS -->
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-label">AUM</div>
+                    <div class="kpi-value" id="kpi-aum">₹1.00 Cr</div>
+                    <div class="kpi-subtext">₹1.00 Cr base</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">PORTFOLIO RETURN</div>
+                    <div class="kpi-value positive" id="kpi-return">+0.00%</div>
+                    <div class="kpi-subtext">vs starting AUM</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">ALPHA VS NIFTY</div>
+                    <div class="kpi-value positive" id="kpi-alpha">+0.00%</div>
+                    <div class="kpi-subtext">vs Nifty 50</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">SHARPE RATIO</div>
+                    <div class="kpi-value negative" id="kpi-sharpe">0.00</div>
+                    <div class="kpi-subtext">Risk-adjusted return</div>
+                </div>
+                <!-- additional kpis etc... -->
+            </div>
+            
+            <div class="dashboard-grid">
+                <div class="dashboard-panel panel-signal-dist">
+                    <h3 class="panel-title">📊 Signal Distribution</h3>
+                    <div class="signal-dist-container" id="signal-distribution">
+                        <!-- populated via JS -->
+                    </div>
+                </div>
+                <div class="dashboard-panel panel-top-opp">
+                    <h3 class="panel-title">🎯 Top Opportunities</h3>
+                    <div class="top-opp-list" id="top-opportunities-list">
+                        <!-- populated via JS -->
+                    </div>
+                </div>
+                <div class="dashboard-panel panel-activity">
+                    <h3 class="panel-title">⚡ Fund Activity Feed</h3>
+                    <div class="activity-feed" id="activity-feed">
+                        <!-- populated via JS -->
+                    </div>
+                </div>
+                <div class="dashboard-panel panel-alerts">
+                    <h3 class="panel-title">🔴 Active Alerts</h3>
+                    <div class="alerts-container" id="active-alerts">
+                        <!-- populated via JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCREEN: SIGNAL ENGINE -->
+        <section id="signal-engine" class="screen-content">
+            <div class="filters-bar">
+                <div class="sector-filters" id="sector-filters">
+                    <button class="filter-btn active" data-sector="All">All</button>
+                    <!-- other sectors added by JS -->
+                </div>
+                <div class="signal-filters" id="signal-filters">
+                    <!-- added by JS -->
+                </div>
+            </div>
+            <div class="stocks-grid" id="stocks-grid">
+                <!-- populated via JS -->
+            </div>
+        </section>
+        
+        <!-- OTHER SCREENS STUBS -->
+        <!-- SCREEN: AI INTELLIGENCE DESK -->
+        <section id="ai-intelligence" class="screen-content">
+            <div class="ai-desk-grid">
+                <div class="dashboard-panel">
+                    <h3 class="panel-title">🌐 Market Mood Indicator</h3>
+                    <div class="mood-indicator" id="market-mood-display">
+                        <div class="mood-badge" id="mood-emoji">📈</div>
+                        <div>
+                            <div style="font-size:18px;font-weight:700;color:#fff" id="mood-text">Cautiously Bullish</div>
+                            <div class="mood-label">Based on aggregate signal distribution across Nifty 50 universe</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dashboard-panel">
+                    <h3 class="panel-title">📡 AI Market Commentary</h3>
+                    <div id="ai-macro-commentary" class="ai-content-box" style="max-height:160px;overflow-y:auto;">
+                        <div class="skeleton-text"></div><div class="skeleton-text"></div><div class="skeleton-text short"></div>
+                    </div>
+                    <button class="btn btn-secondary" style="margin-top:12px" onclick="aiDesk.refreshCommentary()">🔄 Refresh Commentary</button>
+                </div>
+            </div>
+
+            <h3 class="panel-title" style="margin-bottom:16px">💡 Thematic Investment Ideas</h3>
+            <div class="thematic-grid" id="thematic-ideas-grid">
+                <!-- populated by JS -->
+            </div>
+
+            <div class="dashboard-panel">
+                <h3 class="panel-title">📰 Key Market Catalysts</h3>
+                <div id="market-catalysts">
+                    <!-- populated by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- SCREEN: PORTFOLIO MANAGEMENT -->
+        <section id="portfolio" class="screen-content">
+            <div class="portfolio-kpi-strip" id="portfolio-kpi-strip">
+                <div class="pkpi"><div class="pkpi-label">Portfolio Value</div><div class="pkpi-val" id="p-total-val">₹0</div></div>
+                <div class="pkpi"><div class="pkpi-label">Invested</div><div class="pkpi-val" id="p-invested">₹0</div></div>
+                <div class="pkpi"><div class="pkpi-label">Total P&L</div><div class="pkpi-val" id="p-pnl">₹0</div></div>
+                <div class="pkpi"><div class="pkpi-label">Return %</div><div class="pkpi-val" id="p-ret-pct">0.00%</div></div>
+                <div class="pkpi"><div class="pkpi-label">Holdings</div><div class="pkpi-val" id="p-count">0</div></div>
+            </div>
+            <div class="add-stock-form">
+                <select id="port-ticker-select"><!-- filled by JS --></select>
+                <input type="number" id="port-qty" placeholder="Qty" min="1" value="10" style="width:80px">
+                <button class="btn btn-primary" onclick="portfolioMgr.addHolding()">+ Add</button>
+            </div>
+            <div class="portfolio-grid">
+                <div class="dashboard-panel" style="margin-bottom:0">
+                    <h3 class="panel-title">📋 Holdings</h3>
+                    <table class="holdings-table">
+                        <thead><tr>
+                            <th>Ticker</th><th>Qty</th><th>Avg Cost</th><th>LTP</th>
+                            <th>P&L</th><th>P&L%</th><th>Weight</th><th></th>
+                        </tr></thead>
+                        <tbody id="holdings-tbody"></tbody>
+                    </table>
+                </div>
+                <div class="dashboard-panel" style="margin-bottom:0">
+                    <h3 class="panel-title">🥧 Sector Allocation</h3>
+                    <canvas id="sector-alloc-chart" style="max-height:280px"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCREEN: RISK DESK -->
+        <section id="risk-desk" class="screen-content">
+            <div class="risk-grid" id="risk-meters-grid">
+                <!-- populated by JS -->
+            </div>
+            <div class="ai-desk-grid">
+                <div class="dashboard-panel">
+                    <h3 class="panel-title">📉 Drawdown per Holding</h3>
+                    <canvas id="drawdown-chart" style="max-height:220px"></canvas>
+                </div>
+                <div class="dashboard-panel">
+                    <h3 class="panel-title">🔗 Correlation Heatmap (Top 5)</h3>
+                    <div id="corr-heatmap-container"></div>
+                </div>
+            </div>
+            <div class="dashboard-panel">
+                <h3 class="panel-title">🤖 AI Risk Commentary</h3>
+                <div id="risk-commentary" class="ai-content-box"></div>
+            </div>
+        </section>
+
+        <!-- SCREEN: RESEARCH -->
+        <section id="research" class="screen-content">
+            <div class="research-layout">
+                <div class="research-list" id="research-stock-list">
+                    <!-- populated by JS -->
+                </div>
+                <div class="research-report" id="research-report-panel">
+                    <div style="color:var(--text-muted);padding:40px;text-align:center">
+                        👈 Select a stock from the list to generate a research report
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCREEN: BACKTESTER -->
+        <section id="backtest" class="screen-content">
+            <div class="backtest-layout">
+                <div class="backtest-params">
+                    <h3 class="panel-title">⚙️ Strategy Parameters</h3>
+                    <div class="param-group">
+                        <label>Starting Capital (₹)</label>
+                        <input type="number" id="bt-capital" value="10000000">
+                    </div>
+                    <div class="param-group">
+                        <label>Alpha Buy Threshold</label>
+                        <input type="number" id="bt-threshold" value="60" min="0" max="100">
+                    </div>
+                    <div class="param-group">
+                        <label>Hold Period (days)</label>
+                        <input type="number" id="bt-holddays" value="20" min="5" max="60">
+                    </div>
+                    <div class="param-group">
+                        <label>Max Positions</label>
+                        <input type="number" id="bt-maxpos" value="5" min="1" max="10">
+                    </div>
+                    <div class="param-group">
+                        <label>Stop Loss %</label>
+                        <input type="number" id="bt-stoploss" value="8" min="1" max="30">
+                    </div>
+                    <button class="btn btn-primary" style="width:100%;margin-top:8px" onclick="backtester.run()">▶ Run Backtest</button>
+                </div>
+                <div class="backtest-results" id="backtest-results">
+                    <div class="dashboard-panel" style="color:var(--text-muted);text-align:center;padding:60px">
+                        Configure parameters and click "Run Backtest" to begin.
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="settings" class="screen-content">
+            <div class="dashboard-panel">
+                <h3 class="panel-title">API Configuration</h3>
+                <div class="settings-form">
+                    <label>Gemini API Key</label>
+                    <input type="password" id="gemini-api-key" placeholder="Enter API Key">
+                    <button class="btn btn-primary" onclick="app.saveApiKey()">Save Key</button>
+                    <div id="settings-status" style="margin-top: 10px; font-size: 13px;"></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- RIGHT DRAWER (Stock Details) -->
+    <div class="right-drawer" id="stock-drawer">
+        <div class="drawer-header">
+            <h3 id="drawer-stock-name">Stock Name</h3>
+            <button class="close-drawer" onclick="app.closeDrawer()">×</button>
+        </div>
+        <div class="drawer-content">
+           <div id="drawer-charts">
+               <canvas id="drawer-price-chart"></canvas>
+           </div>
+           
+           <div class="drawer-section">
+               <h4>Technical Metrics</h4>
+               <div class="drawer-grid" id="drawer-tech-metrics">
+                   <!-- populated via js -->
+               </div>
+           </div>
+           
+           <div class="drawer-section">
+               <h4>AI Fundamental Analysis</h4>
+               <div id="drawer-ai-analysis" class="ai-content-box">
+                   <!-- populated via js -->
+                   <div class="skeleton-text"></div>
+                   <div class="skeleton-text"></div>
+                   <div class="skeleton-text short"></div>
+               </div>
+           </div>
+        </div>
+    </div>
+    <div class="drawer-overlay" id="drawer-overlay" onclick="app.closeDrawer()"></div>
+
+    <script>
+// --- CORE CONFIGURATION & STATE ---
+const NIFTY_50 = [
+    { ticker: "RELIANCE", name: "Reliance Ind.", sector: "Energy", basePrice: 2800, vol: 0.15 },
+    { ticker: "TCS", name: "Tata Consultancy", sector: "IT", basePrice: 4000, vol: 0.12 },
+    { ticker: "HDFCBANK", name: "HDFC Bank", sector: "Banking", basePrice: 1400, vol: 0.18 },
+    { ticker: "ICICIBANK", name: "ICICI Bank", sector: "Banking", basePrice: 1050, vol: 0.20 },
+    { ticker: "INFY", name: "Infosys", sector: "IT", basePrice: 1600, vol: 0.14 },
+    { ticker: "ITC", name: "ITC Ltd", sector: "FMCG", basePrice: 420, vol: 0.10 },
+    { ticker: "SBIN", name: "State Bank of India", sector: "Banking", basePrice: 750, vol: 0.22 },
+    { ticker: "L&T", name: "Larsen & Toubro", sector: "Conglomerate", basePrice: 3500, vol: 0.16 },
+    { ticker: "BAJFINANCE", name: "Bajaj Finance", sector: "Finance", basePrice: 7000, vol: 0.25 },
+    { ticker: "MARUTI", name: "Maruti Suzuki", sector: "Auto", basePrice: 12000, vol: 0.15 },
+    { ticker: "AXISBANK", name: "Axis Bank", sector: "Banking", basePrice: 1050, vol: 0.21 },
+    { ticker: "SUNPHARMA", name: "Sun Pharma", sector: "Pharma", basePrice: 1500, vol: 0.13 },
+    { ticker: "KOTAKBANK", name: "Kotak Mahindra", sector: "Banking", basePrice: 1750, vol: 0.17 },
+    { ticker: "TITAN", name: "Titan Company", sector: "Conglomerate", basePrice: 3600, vol: 0.19 },
+    { ticker: "ONGC", name: "ONGC", sector: "Energy", basePrice: 270, vol: 0.24 },
+    { ticker: "TATAMOTORS", name: "Tata Motors", sector: "Auto", basePrice: 950, vol: 0.28 },
+    { ticker: "NTPC", name: "NTPC", sector: "Energy", basePrice: 350, vol: 0.18 },
+    { ticker: "ASIANPAINT", name: "Asian Paints", sector: "FMCG", basePrice: 2800, vol: 0.15 },
+    // Abridged list with 18 key Nifty 50 stocks for performance in single-file simulation.
+];
+
+const state = {
+    stocks: [],   // Array of { ticker, data: [{date, close, high, low, open, vol}], techScore, fundScore, totalAlpha, signal }
+    aumTracker: [10000000], // Start at 1 Cr setting
+    currentSectorFilter: "All",
+    simDays: 120
+};
+
+// --- SIMULATION ENGINE (Geometric Brownian Motion + Technicals) ---
+function simulateMarketData() {
+    logActivity(`Simulating ${state.simDays} days of data for ${NIFTY_50.length} stocks...`);
+    state.stocks = NIFTY_50.map(meta => {
+        let prices = [];
+        let p = meta.basePrice;
+        let trend = (Math.random() - 0.4) * 0.002; // Slight drift
+        
+        for(let i=0; i<state.simDays; i++) {
+            let shock = (Math.random() - 0.5) * meta.vol * 0.1;
+            p = p * (1 + trend + shock);
+            prices.push(Math.max(1, p));
+        }
+        
+        // Calculate Technical Indicators on final frame
+        let rsi = calculateRSI(prices, 14);
+        let sma50 = calculateSMA(prices, 50);
+        let sma200 = calculateSMA(prices, 200);
+        let currentPrice = prices[prices.length-1];
+        let pctChange = ((currentPrice - prices[prices.length-2]) / prices[prices.length-2]) * 100;
+        
+        // Technical Alpha Score Logic (0-50)
+        let techScore = 0;
+        if(rsi < 30) techScore += 20; // Oversold
+        else if(rsi > 70) techScore -= 10; // Overbought
+        else techScore += 10;
+        
+        if(currentPrice > sma50) techScore += 15;
+        if(sma50 > sma200) techScore += 15;
+        
+        let initialFundScore = Math.floor(Math.random() * 40); // 0-40 baseline, updated by AI later
+        let totalAlpha = techScore + initialFundScore;
+        
+        let signal = "WATCHLIST";
+        if(totalAlpha > 80) signal = "CONVICTION BUY";
+        else if(totalAlpha > 60) signal = "BUY";
+        else if(totalAlpha < 40) signal = "UNDERWEIGHT";
+        
+        return {
+            ...meta,
+            prices,
+            currentPrice,
+            pctChange,
+            indicators: { rsi, sma50, sma200 },
+            techScore,
+            fundScore: initialFundScore,
+            totalAlpha,
+            signal,
+            needsAIUpdate: true
+        };
+    });
+    
+    // Sort by alpha score descending
+    state.stocks.sort((a, b) => b.totalAlpha - a.totalAlpha);
+    updateDashboardUI();
+    logActivity(`Signal Engine computed for all stocks.`);
+}
+
+function calculateSMA(data, period) {
+    if(data.length < period) return data[data.length-1];
+    let sum = data.slice(-period).reduce((a, b) => a + b, 0);
+    return sum / period;
+}
+function calculateRSI(data, period) {
+    if(data.length <= period) return 50;
+    let gains = 0, losses = 0;
+    for(let i = data.length - period; i < data.length; i++) {
+        let diff = data[i] - data[i-1];
+        if(diff > 0) gains += diff;
+        else losses -= diff;
+    }
+    let rs = (gains / period) / (losses / period || 1);
+    return 100 - (100 / (1 + rs));
+}
+
+// --- UI AND INTERACTION ---
+
+function logActivity(msg, type="default") {
+    const feed = document.getElementById("activity-feed");
+    const id = Date.now();
+    const time = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit'});
+    feed.innerHTML = `
+        <div class="feed-item">
+            <div class="feed-dot ${type}"></div>
+            <div>
+                <div class="feed-text">${msg}</div>
+                <div class="feed-time">${time}</div>
+            </div>
+        </div>
+    ` + feed.innerHTML;
+}
+
+function formatCurency(num) {
+    return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumSignificantDigits: 4 }).format(num);
+}
+
+function getSignalColorStr(signal) {
+    if(signal.includes("BUY")) return "var(--positive)";
+    if(signal.includes("WATCH")) return "var(--warning)";
+    return "var(--negative)";
+}
+
+function updateDashboardUI() {
+    // 1. Update Signal Distribution KPI
+    let dist = { "CONVICTION BUY":0, "BUY":0, "WATCHLIST":0, "UNDERWEIGHT":0, "SHORT/AVOID":0 };
+    state.stocks.forEach(s => {
+        if(dist[s.signal] !== undefined) dist[s.signal]++;
+        else dist["SHORT/AVOID"]++;
+    });
+    
+    document.getElementById("signal-distribution").innerHTML = `
+        <div class="signal-dist-grid">
+            <div class="dist-box"><div class="dist-val">${dist["CONVICTION BUY"]+dist["BUY"]}</div><div class="dist-lbl">BUYS</div></div>
+            <div class="dist-box"><div class="dist-val">${dist["WATCHLIST"]}</div><div class="dist-lbl">WATCHLIST</div></div>
+            <div class="dist-box"><div class="dist-val">${dist["UNDERWEIGHT"]}</div><div class="dist-lbl">UNDERWEIGHT</div></div>
+            <div class="dist-box"><div class="dist-val">${dist["SHORT/AVOID"]}</div><div class="dist-lbl">SHORT/AVOID</div></div>
+        </div>
+    `;
+
+    // 2. Top Opportunities Model
+    let top3 = state.stocks.slice(0, 4);
+    document.getElementById("top-opportunities-list").innerHTML = `
+        <table class="top-opp-table">
+            ${top3.map(s => `
+                <tr>
+                    <td><strong>${s.ticker}</strong><br><span style="color:var(--text-muted);font-size:11px">${s.name}</span></td>
+                    <td style="text-align:right">₹${s.currentPrice.toFixed(2)}<br><span class="signal-badge ${s.signal.includes('CONVICTION')?'conviction':''}">${s.signal}</span></td>
+                    <td style="text-align:right; font-weight:bold; color:var(--accent-gold)">${s.totalAlpha}</td>
+                    <td style="text-align:right"><button class="btn btn-secondary" onclick="app.openDrawer('${s.ticker}')">+Add</button></td>
+                </tr>
+            `).join('')}
+        </table>
+    `;
+    
+    // 3. Update Signal Engine Grid
+    renderStocksGrid();
+}
+
+function renderStocksGrid() {
+    const grid = document.getElementById("stocks-grid");
+    grid.innerHTML = "";
+    
+    let filtered = state.stocks;
+    if(state.currentSectorFilter !== "All") {
+        filtered = filtered.filter(s => s.sector === state.currentSectorFilter);
+    }
+    
+    filtered.forEach((s, idx) => {
+        let isPos = s.pctChange >= 0;
+        let pColor = isPos ? "var(--positive)" : "var(--negative)";
+        let sign = isPos ? "+" : "";
+        let signalClass = s.signal.includes('CONVICTION') ? 'conviction' : '';
+        
+        let card = document.createElement("div");
+        card.className = "stock-card";
+        card.onclick = () => app.openDrawer(s.ticker);
+        
+        let canvasId = `chart-${s.ticker}-${idx}`;
+        
+        card.innerHTML = `
+            <div class="card-top">
+                <div class="ticker">${s.ticker}</div>
+                <div class="price" style="color:${pColor}">${sign}${s.pctChange.toFixed(1)}%</div>
+            </div>
+            <div class="name-sub">${s.name}</div>
+            
+            <div class="metrics-row">
+                <span style="font-size:18px;font-weight:700">₹${s.currentPrice.toFixed(0)}</span>
+                <span class="sector-badge" style="color:var(--sector-${s.sector.toLowerCase()}); border:1px solid var(--sector-${s.sector.toLowerCase()})">${s.sector}</span>
+            </div>
+            
+            <div class="mini-chart"><canvas id="${canvasId}"></canvas></div>
+
+            <div class="score-bar-container">
+                <div class="score-flex"><span>Tech</span> <span>${s.techScore}</span></div>
+                <div class="score-track"><div class="score-fill" style="width:${(s.techScore/50)*100}%;background:#58a6ff"></div></div>
+            </div>
+            <div class="score-bar-container">
+                <div class="score-flex"><span>Fund</span> <span>${s.needsAIUpdate ? '?' : s.fundScore}</span></div>
+                <div class="score-track"><div class="score-fill" style="width:${(s.fundScore/50)*100}%;background:var(--accent-gold)"></div></div>
+            </div>
+            
+            <div class="card-footer">
+                <span class="signal-badge ${signalClass}">${s.signal}</span>
+                <span class="total-alpha">${s.totalAlpha}</span>
+            </div>
+        `;
+        grid.appendChild(card);
+        
+        // Draw sparkline
+        let ctx = document.getElementById(canvasId).getContext("2d");
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: s.prices.map((_,i)=>i),
+                datasets: [{
+                    data: s.prices,
+                    borderColor: pColor,
+                    borderWidth: 1.5,
+                    pointRadius: 0,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: {display: false}, tooltip: {enabled: false} },
+                scales: { x: {display: false}, y: {display: false} },
+                layout: { padding: 0 }
+            }
+        });
+    });
+}
+
+function setupFilters() {
+    const filters = document.getElementById("sector-filters");
+    const sectors = ["All", ...new Set(NIFTY_50.map(s => s.sector))];
+    
+    filters.innerHTML = sectors.map(sec => 
+        `<button class="filter-btn ${sec==='All'?'active':''}" data-sector="${sec}">${sec}</button>`
+    ).join('');
+    
+    filters.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            filters.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            state.currentSectorFilter = e.target.getAttribute('data-sector');
+            renderStocksGrid();
+        });
+    });
+}
+
+// --- GEMINI API INTEGRATION ---
+async function fetchGeminiAnalysis(ticker) {
+    const key = localStorage.getItem("RCCIITGV_GEMINI_KEY");
+    const container = document.getElementById("drawer-ai-analysis");
+    
+    // reset skeleton
+    container.innerHTML = `<div class="skeleton-text"></div><div class="skeleton-text"></div><div class="skeleton-text short"></div>`;
+
+    const showMockAnalysis = (ticker) => {
+        const stock = state.stocks.find(s => s.ticker === ticker);
+        const theses = [
+            `${ticker} remains a resilient compounder within its sector, with strong free cash flow generation and improving return on equity. Management has demonstrated consistent capital discipline, and the balance sheet is well-positioned to absorb macro shocks. Near-term sentiment is supported by institutional re-rating on sector tailwinds.`,
+            `${ticker} is at a structural inflection point, with accelerating revenue growth driven by domestic demand and export diversification. Margin expansion is expected as input costs moderate and operating leverage kicks in over the next two quarters. Consensus estimates appear conservative given recent order book strength.`,
+            `${ticker} exhibits defensive characteristics with pricing power and a wide economic moat within its competitive landscape. Earnings visibility is high given recurring revenue streams and long-term customer contracts. The stock offers an attractive risk/reward for quality-focused mandates.`,
+        ];
+        const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+        const mockScore = stock ? stock.fundScore : Math.floor(15 + Math.random() * 30);
+        const text = pick(theses);
+        container.innerHTML = `
+            <div style="margin-bottom:12px;">${text}</div>
+            <div style="color:var(--accent-gold); font-weight:700;">AI Simulated Score: ${mockScore}/50</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:8px;">⚡ Simulated — add a valid Gemini API key in Settings for live analysis.</div>
+        `;
+        if (stock) {
+            stock.fundScore = mockScore;
+            stock.totalAlpha = stock.techScore + stock.fundScore;
+            stock.needsAIUpdate = false;
+            if(stock.totalAlpha > 80) stock.signal = "CONVICTION BUY";
+            else if(stock.totalAlpha > 60) stock.signal = "BUY";
+            else if(stock.totalAlpha < 40) stock.signal = "UNDERWEIGHT";
+            else stock.signal = "WATCHLIST";
+            updateDashboardUI();
+        }
+    };
+
+    if (!key) {
+        setTimeout(() => showMockAnalysis(ticker), 700);
+        return;
+    }
+
+    try {
+        const prompt = `Analyze the stock ${ticker} for an institutional hedge fund. Provide a short 3 sentence fundamental analysis on its growth, value, and sentiment. End with a line exactly in format 'FUNDAMENTAL_SCORE: XX' where XX is a number between 0 and 50 representing conviction (50 is highest).`;
+        
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+        });
+        
+        if(!res.ok) throw new Error("API Request Failed");
+        const data = await res.json();
+        const text = data.candidates[0].content.parts[0].text;
+        
+        let scoreMatch = text.match(/FUNDAMENTAL_SCORE:\s*(\d+)/i);
+        let updatedScore = scoreMatch ? parseInt(scoreMatch[1]) : 25;
+        
+        let htmlText = text.replace(/FUNDAMENTAL_SCORE:\s*(\d+)/i, "").replace(/\n/g, "<br>");
+        
+        container.innerHTML = `
+            <div style="margin-bottom:12px;">${htmlText}</div>
+            <div style="color:var(--accent-gold); font-weight:700;">AI Extracted Score: ${updatedScore}/50</div>
+        `;
+        
+        // Update State
+        let stock = state.stocks.find(s => s.ticker === ticker);
+        if(stock) {
+            stock.fundScore = updatedScore;
+            stock.totalAlpha = stock.techScore + stock.fundScore;
+            stock.needsAIUpdate = false;
+            
+            if(stock.totalAlpha > 80) stock.signal = "CONVICTION BUY";
+            else if(stock.totalAlpha > 60) stock.signal = "BUY";
+            else if(stock.totalAlpha < 40) stock.signal = "UNDERWEIGHT";
+            else stock.signal = "WATCHLIST";
+            
+            updateDashboardUI();
+        }
+        
+    } catch (err) {
+        console.warn("Gemini API unavailable, using simulated analysis:", err.message);
+        showMockAnalysis(ticker);
+    }
+}
+
+// --- APP CONTROLLER ---
+const app = {
+    chartInstance: null,
+    
+    init() {
+        logActivity("RCCIITGV platform initialized");
+        setupFilters();
+        simulateMarketData();
+        
+        document.getElementById("active-alerts").innerHTML = `
+            <div class="alert-item" style="background:rgba(63, 185, 80, 0.1); border-color:rgba(63,185,80,0.2)">
+                <span style="color:var(--positive)">✅</span>
+                <span class="alert-text">No active risk alerts. Portfolio volatility is within expected bounds.</span>
+            </div>
+        `;
+        
+        // Hook Nav
+        document.querySelectorAll('.nav-item').forEach(el => {
+            el.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                el.classList.add('active');
+                
+                let target = el.getAttribute('data-target');
+                document.querySelectorAll('.screen-content').forEach(s => s.classList.remove('active'));
+                document.getElementById(target).classList.add('active');
+                
+                // Update Page Title
+                let tabName = el.innerText.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]|\s/g, " ").trim();
+                document.getElementById('page-title').innerText = tabName;
+                
+                if(target === "settings") {
+                    let k = localStorage.getItem("RCCIITGV_GEMINI_KEY");
+                    if(k) document.getElementById("gemini-api-key").value = k;
+                }
+            });
+        });
+        
+        // Auto-save user provided API key if not present
+        if(!localStorage.getItem("RCCIITGV_GEMINI_KEY")) {
+             localStorage.setItem("RCCIITGV_GEMINI_KEY", "");
+        }
+    },
+    
+    refreshData() {
+        simulateMarketData();
+    },
+    
+    saveApiKey() {
+        const val = document.getElementById("gemini-api-key").value;
+        localStorage.setItem("RCCIITGV_GEMINI_KEY", val);
+        document.getElementById("settings-status").innerHTML = `<span style="color:var(--positive)">✅ API Key Saved</span>`;
+        setTimeout(() => document.getElementById("settings-status").innerHTML = "", 3000);
+    },
+    
+    openDrawer(ticker) {
+        const stock = state.stocks.find(s => s.ticker === ticker);
+        if(!stock) return;
+        
+        document.getElementById("drawer-stock-name").innerText = `${stock.ticker} - ${stock.name}`;
+        document.getElementById("stock-drawer").classList.add("open");
+        document.getElementById("drawer-overlay").classList.add("open");
+        
+        // Populate tech metrics
+        document.getElementById("drawer-tech-metrics").innerHTML = `
+            <div class="metric-box"><label>Current Price</label><val>₹${stock.currentPrice.toFixed(2)}</val></div>
+            <div class="metric-box"><label>RSI (14)</label><val>${stock.indicators.rsi.toFixed(1)}</val></div>
+            <div class="metric-box"><label>SMA (50)</label><val>₹${stock.indicators.sma50.toFixed(2)}</val></div>
+            <div class="metric-box"><label>SMA (200)</label><val>₹${stock.indicators.sma200.toFixed(2)}</val></div>
+            <div class="metric-box"><label>Volatility</label><val>${(stock.vol*100).toFixed(1)}%</val></div>
+            <div class="metric-box"><label>Total Alpha</label><val style="color:var(--accent-gold); font-size:18px">${stock.totalAlpha}</val></div>
+        `;
+        
+        // Chart
+        if(this.chartInstance) this.chartInstance.destroy();
+        const ctx = document.getElementById("drawer-price-chart").getContext("2d");
+        this.chartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: stock.prices.map((_,i)=>i),
+                datasets: [
+                    { label: 'Close Price', data: stock.prices, borderColor: '#58a6ff', borderWidth: 2, pointRadius: 0, tension: 0.1 },
+                    { label: 'SMA 50', data: stock.prices.map((_,i) => calculateSMA(stock.prices.slice(0,i+1), 50)), borderColor: '#e2b714', borderWidth: 1, pointRadius: 0, borderDash: [5,5] }
+                ]
+            },
+            options: { responsive: true, interaction: { mode: 'index', intersect: false } }
+        });
+        
+        // Fire Gemini request
+        fetchGeminiAnalysis(ticker);
+    },
+    
+    closeDrawer() {
+        document.getElementById("stock-drawer").classList.remove("open");
+        document.getElementById("drawer-overlay").classList.remove("open");
+    }
+};
+
+// =====================================================================
+// MODULE: AI INTELLIGENCE DESK
+// =====================================================================
+const aiDesk = {
+    themes: [
+        { icon: "⚡", name: "PSU Revival", desc: "NTPC, ONGC capitalising on Govt. capex push & energy transition mandates.", stocks: ["NTPC","ONGC"], ret: "+22.4%" },
+        { icon: "💊", name: "Pharma Exports", desc: "Sun Pharma & generics players benefiting from US FDA approvals & EM demand.", stocks: ["SUNPHARMA"], ret: "+18.1%" },
+        { icon: "🚗", name: "EV Transition", desc: "Tata Motors & Maruti racing to capture EV market share in India.", stocks: ["TATAMOTORS","MARUTI"], ret: "+31.6%" },
+        { icon: "🏦", name: "Credit Growth", desc: "HDFC, ICICI & Bajaj Finance ride retail credit boom as GDP accelerates.", stocks: ["HDFCBANK","ICICIBANK","BAJFINANCE"], ret: "+14.8%" },
+        { icon: "🖥️", name: "Digital India", desc: "TCS & Infosys winning large government digitisation contracts.", stocks: ["TCS","INFY"], ret: "+11.2%" },
+        { icon: "🎨", name: "Premiumisation", desc: "Asian Paints & Titan benefiting from rising urban aspirational spend.", stocks: ["ASIANPAINT","TITAN"], ret: "+19.7%" },
+    ],
+
+    macroCommentaries: [
+        "Indian equities remain supported by robust domestic consumption and a resilient banking sector. RBI's accommodative stance has kept liquidity conditions favourable, driving credit growth above 14% YoY. Nifty 50 valuations at ~19x forward P/E appear fair given double-digit earnings growth trajectory. Key risks include elevated crude prices and a strong dollar pressuring the INR.",
+        "The Nifty 50 universe is exhibiting a bifurcated market: IT and Pharma sectors are seeing export tailwinds while domestic-oriented sectors like Banking and Auto benefit from strong credit and consumption cycles. Q3 earnings season beat estimates across 60% of large-caps. FII flows have turned positive after 3 months of outflows, adding a technical tailwind to the index.",
+        "Macro conditions remain broadly supportive for Indian equities. GST collections above ₹1.7 lakh crore signal strong economic activity. Infrastructure spend is accelerating with the PLI schemes creating manufacturing capacity. However, elections in 5 states introduce near-term policy uncertainty. Our model is positioned defensively in Quality and Momentum factors while reducing high-beta exposure.",
+    ],
+
+    catalysts: [
+        { icon: "📊", event: "RBI MPC Meeting", date: "Apr 3–5", impact: "high", desc: "Rate decision critical for banking sector re-rating. Market expects hold at 6.5%." },
+        { icon: "📈", event: "Nifty 50 Index Rebalance", date: "Apr 15", impact: "medium", desc: "Potential inclusion/exclusion of 2 stocks. Passive flows could be meaningful." },
+        { icon: "💹", event: "Q4 Results Season", date: "Apr 12 onwards", impact: "high", desc: "IT majors TCS, Infosys report first. Guidance commentary key for sector direction." },
+        { icon: "🌐", event: "US Fed Decision", date: "May 1", impact: "medium", desc: "Fed dot-plot revision could trigger FII flow reversal into/out of EMs." },
+        { icon: "🛢️", event: "OPEC+ Output Decision", date: "Apr 2", impact: "medium", desc: "Crude price trajectory critical for ONGC, RELIANCE and India's fiscal math." },
+    ],
+
+    init() {
+        this.renderThemes();
+        this.renderCatalysts();
+        this.updateMood();
+        this.refreshCommentary();
+    },
+
+    updateMood() {
+        if (!state.stocks.length) return;
+        let buys = state.stocks.filter(s => s.signal.includes("BUY")).length;
+        let total = state.stocks.length;
+        let ratio = buys / total;
+        let mood, emoji, color;
+        if (ratio > 0.6)      { mood = "Strongly Bullish";    emoji = "🚀"; color = "var(--positive)"; }
+        else if (ratio > 0.4) { mood = "Cautiously Bullish";  emoji = "📈"; color = "var(--positive)"; }
+        else if (ratio > 0.25){ mood = "Neutral / Mixed";     emoji = "⚖️"; color = "var(--warning)"; }
+        else                  { mood = "Cautiously Bearish";  emoji = "📉"; color = "var(--negative)"; }
+        document.getElementById("mood-emoji").innerText = emoji;
+        document.getElementById("mood-text").innerText = mood;
+        document.getElementById("mood-text").style.color = color;
+    },
+
+    refreshCommentary() {
+        const box = document.getElementById("ai-macro-commentary");
+        if (!box) return;
+        box.innerHTML = `<div class="skeleton-text"></div><div class="skeleton-text"></div><div class="skeleton-text short"></div>`;
+        const key = localStorage.getItem("RCCIITGV_GEMINI_KEY");
+        if (key) {
+            const prompt = "Give a 3-sentence institutional macro commentary on Indian equity markets (Nifty 50 universe) for a hedge fund portfolio manager. Focus on macro themes, sector rotations and key risks.";
+            fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
+                method: "POST", headers: {"Content-Type":"application/json"},
+                body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+            }).then(r => r.json()).then(d => {
+                const txt = d.candidates[0].content.parts[0].text.replace(/\n/g, "<br>");
+                box.innerHTML = txt;
+            }).catch(() => box.innerHTML = this.macroCommentaries[Math.floor(Math.random() * this.macroCommentaries.length)]);
+        } else {
+            setTimeout(() => {
+                box.innerHTML = this.macroCommentaries[Math.floor(Math.random() * this.macroCommentaries.length)];
+            }, 800);
+        }
+    },
+
+    renderThemes() {
+        const grid = document.getElementById("thematic-ideas-grid");
+        if (!grid) return;
+        grid.innerHTML = this.themes.map(t => `
+            <div class="theme-card">
+                <div class="theme-icon">${t.icon}</div>
+                <div class="theme-name">${t.name}</div>
+                <div class="theme-desc">${t.desc}</div>
+                <div class="theme-return" style="color:var(--positive)">${t.ret} YTD</div>
+                <div style="margin-top:8px;font-size:11px;color:var(--text-muted)">${t.stocks.join(" · ")}</div>
+            </div>
+        `).join("");
+    },
+
+    renderCatalysts() {
+        const el = document.getElementById("market-catalysts");
+        if (!el) return;
+        el.innerHTML = this.catalysts.map(c => `
+            <div class="feed-item">
+                <div class="feed-dot" style="background:${c.impact==='high'?'var(--negative)':'var(--warning)'}"></div>
+                <div style="flex:1">
+                    <div class="feed-text"><strong>${c.icon} ${c.event}</strong> <span style="color:var(--text-muted);font-size:11px">${c.date}</span></div>
+                    <div style="font-size:12px;color:var(--text-muted);margin-top:2px">${c.desc}</div>
+                </div>
+                <span style="font-size:10px;padding:2px 8px;border-radius:4px;border:1px solid;${c.impact==='high'?'color:var(--negative);border-color:var(--negative)':'color:var(--warning);border-color:var(--warning)'}">${c.impact.toUpperCase()}</span>
+            </div>
+        `).join("");
+    }
+};
+
+// =====================================================================
+// MODULE: PORTFOLIO MANAGER
+// =====================================================================
+const portfolioMgr = {
+    holdings: [], // { ticker, qty, avgCost }
+    chartInstance: null,
+
+    init() {
+        const sel = document.getElementById("port-ticker-select");
+        if (!sel) return;
+        sel.innerHTML = NIFTY_50.map(s => `<option value="${s.ticker}">${s.ticker} – ${s.name}</option>`).join("");
+        this.renderHoldings();
+    },
+
+    addHolding() {
+        const ticker = document.getElementById("port-ticker-select").value;
+        const qty = parseInt(document.getElementById("port-qty").value) || 10;
+        const stock = state.stocks.find(s => s.ticker === ticker);
+        if (!stock) return;
+        const existing = this.holdings.find(h => h.ticker === ticker);
+        if (existing) {
+            const totalCost = existing.avgCost * existing.qty + stock.currentPrice * qty;
+            existing.qty += qty;
+            existing.avgCost = totalCost / existing.qty;
+        } else {
+            this.holdings.push({ ticker, qty, avgCost: stock.currentPrice * (0.92 + Math.random() * 0.1) });
+        }
+        this.renderHoldings();
+        logActivity(`Added ${qty} × ${ticker} to portfolio`);
+    },
+
+    removeHolding(ticker) {
+        this.holdings = this.holdings.filter(h => h.ticker !== ticker);
+        this.renderHoldings();
+        logActivity(`Removed ${ticker} from portfolio`);
+    },
+
+    renderHoldings() {
+        const tbody = document.getElementById("holdings-tbody");
+        if (!tbody) return;
+        let totalVal = 0, totalInvested = 0;
+        const sectorMap = {};
+
+        const rows = this.holdings.map(h => {
+            const stock = state.stocks.find(s => s.ticker === h.ticker) || { currentPrice: h.avgCost, sector: "N/A" };
+            const ltp = stock.currentPrice;
+            const invested = h.avgCost * h.qty;
+            const curVal = ltp * h.qty;
+            const pnl = curVal - invested;
+            const pnlPct = (pnl / invested) * 100;
+            totalVal += curVal;
+            totalInvested += invested;
+            sectorMap[stock.sector] = (sectorMap[stock.sector] || 0) + curVal;
+            return { ...h, ltp, invested, curVal, pnl, pnlPct, sector: stock.sector };
+        });
+
+        tbody.innerHTML = rows.map(r => {
+            const weight = totalVal > 0 ? ((r.curVal / totalVal) * 100).toFixed(1) : "0.0";
+            const pnlCls = r.pnl >= 0 ? "win" : "loss";
+            const pnlSign = r.pnl >= 0 ? "+" : "";
+            return `<tr>
+                <td><strong>${r.ticker}</strong><br><span style="color:var(--text-muted);font-size:11px">${r.sector}</span></td>
+                <td>${r.qty}</td>
+                <td>₹${r.avgCost.toFixed(0)}</td>
+                <td>₹${r.ltp.toFixed(0)}</td>
+                <td class="${pnlCls}">${pnlSign}₹${Math.abs(r.pnl).toFixed(0)}</td>
+                <td class="${pnlCls}">${pnlSign}${r.pnlPct.toFixed(1)}%</td>
+                <td>${weight}%</td>
+                <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="portfolioMgr.removeHolding('${r.ticker}')">✕</button></td>
+            </tr>`;
+        }).join("");
+
+        if (this.holdings.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:32px">No holdings. Add stocks using the form above.</td></tr>`;
+        }
+
+        const totalPnl = totalVal - totalInvested;
+        const retPct = totalInvested > 0 ? ((totalPnl / totalInvested) * 100) : 0;
+        const fmt = n => new Intl.NumberFormat('en-IN', {style:'currency',currency:'INR',maximumSignificantDigits:5}).format(n);
+        document.getElementById("p-total-val").innerText = fmt(totalVal);
+        document.getElementById("p-invested").innerText = fmt(totalInvested);
+        document.getElementById("p-pnl").innerText = (totalPnl >= 0 ? "+" : "") + fmt(totalPnl);
+        document.getElementById("p-pnl").style.color = totalPnl >= 0 ? "var(--positive)" : "var(--negative)";
+        document.getElementById("p-ret-pct").innerText = (retPct >= 0 ? "+" : "") + retPct.toFixed(2) + "%";
+        document.getElementById("p-ret-pct").style.color = retPct >= 0 ? "var(--positive)" : "var(--negative)";
+        document.getElementById("p-count").innerText = this.holdings.length;
+
+        this.renderAllocationChart(sectorMap);
+    },
+
+    renderAllocationChart(sectorMap) {
+        const canvas = document.getElementById("sector-alloc-chart");
+        if (!canvas) return;
+        if (this.chartInstance) this.chartInstance.destroy();
+        const sectors = Object.keys(sectorMap);
+        if (!sectors.length) return;
+        const colors = ["#e2b714","#3fb950","#58a6ff","#8957e5","#f85149","#33b3ae","#d29922","#c586c0"];
+        this.chartInstance = new Chart(canvas.getContext("2d"), {
+            type: "doughnut",
+            data: {
+                labels: sectors,
+                datasets: [{ data: sectors.map(s => sectorMap[s]), backgroundColor: colors.slice(0, sectors.length), borderWidth: 2, borderColor: "#1c2128" }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: "bottom", labels: { color: "#8b949e", font: { size: 11 } } } }
+            }
+        });
+    }
+};
+
+// =====================================================================
+// MODULE: RISK DESK
+// =====================================================================
+const riskDesk = {
+    drawdownChart: null,
+
+    init() {
+        if (!state.stocks.length) return;
+        this.renderMeters();
+        this.renderDrawdownChart();
+        this.renderCorrelation();
+        this.renderCommentary();
+    },
+
+    calcMaxDrawdown(prices) {
+        let peak = -Infinity, maxDD = 0;
+        for (const p of prices) {
+            if (p > peak) peak = p;
+            const dd = (peak - p) / peak;
+            if (dd > maxDD) maxDD = dd;
+        }
+        return maxDD * 100;
+    },
+
+    calcPortfolioVaR() {
+        const portfolio = portfolioMgr.holdings.length ? portfolioMgr.holdings : state.stocks.slice(0, 5).map(s => ({ ticker: s.ticker, qty: 100 }));
+        const dailyReturns = portfolio.map(h => {
+            const stock = state.stocks.find(s => s.ticker === h.ticker);
+            if (!stock) return [];
+            return stock.prices.slice(1).map((p, i) => (p - stock.prices[i]) / stock.prices[i]);
+        });
+        if (!dailyReturns.length || !dailyReturns[0].length) return 2.5;
+        const portReturns = dailyReturns[0].map((_, day) => dailyReturns.reduce((sum, r) => sum + (r[day] || 0), 0) / dailyReturns.length);
+        const sorted = [...portReturns].sort((a, b) => a - b);
+        return Math.abs(sorted[Math.floor(sorted.length * 0.05)] * 100);
+    },
+
+    renderMeters() {
+        const grid = document.getElementById("risk-meters-grid");
+        if (!grid) return;
+        const var95 = this.calcPortfolioVaR();
+        const avgDD = state.stocks.slice(0, 5).reduce((sum, s) => sum + this.calcMaxDrawdown(s.prices), 0) / 5;
+        const avgVol = state.stocks.reduce((sum, s) => sum + s.vol, 0) / state.stocks.length * 100;
+        const concentration = portfolioMgr.holdings.length > 0
+            ? Math.min(100, 100 / portfolioMgr.holdings.length * 2)
+            : 50;
+        const beta = 0.85 + Math.random() * 0.3;
+
+        const meters = [
+            { label: "Portfolio VaR (95%)", val: var95.toFixed(1) + "%", level: var95 > 3 ? "high" : var95 > 2 ? "medium" : "low", desc: "Daily loss not exceeded 95% of time" },
+            { label: "Avg Max Drawdown", val: avgDD.toFixed(1) + "%", level: avgDD > 20 ? "high" : avgDD > 12 ? "medium" : "low", desc: "Peak-to-trough across top holdings" },
+            { label: "Portfolio Beta", val: beta.toFixed(2), level: beta > 1.1 ? "high" : beta > 0.9 ? "medium" : "low", desc: "Market sensitivity vs Nifty 50" },
+            { label: "Avg Annualised Vol", val: avgVol.toFixed(1) + "%", level: avgVol > 25 ? "high" : avgVol > 18 ? "medium" : "low", desc: "Historical price volatility" },
+            { label: "Concentration Risk", val: concentration.toFixed(0) + "%", level: concentration > 60 ? "high" : concentration > 35 ? "medium" : "low", desc: "% AUM in top single position" },
+            { label: "Liquidity Score", val: "High", level: "low", desc: "All holdings are large-cap Nifty 50" },
+        ];
+
+        grid.innerHTML = meters.map(m => `
+            <div class="risk-meter">
+                <div class="risk-meter-label">${m.label}</div>
+                <div class="risk-gauge ${m.level}">${m.val}</div>
+                <div style="font-size:11px;color:var(--text-muted)">${m.desc}</div>
+            </div>
+        `).join("");
+    },
+
+    renderDrawdownChart() {
+        const canvas = document.getElementById("drawdown-chart");
+        if (!canvas) return;
+        if (this.drawdownChart) this.drawdownChart.destroy();
+        const top = state.stocks.slice(0, 6);
+        this.drawdownChart = new Chart(canvas.getContext("2d"), {
+            type: "bar",
+            data: {
+                labels: top.map(s => s.ticker),
+                datasets: [{
+                    label: "Max Drawdown %",
+                    data: top.map(s => -this.calcMaxDrawdown(s.prices)),
+                    backgroundColor: "rgba(248,81,73,0.6)",
+                    borderColor: "var(--negative)",
+                    borderWidth: 1, borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false, indexAxis: "y",
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { ticks: { color: "#8b949e", callback: v => v + "%" }, grid: { color: "rgba(255,255,255,0.05)" } },
+                    y: { ticks: { color: "#c9d1d9" }, grid: { display: false } }
+                }
+            }
+        });
+    },
+
+    renderCorrelation() {
+        const el = document.getElementById("corr-heatmap-container");
+        if (!el) return;
+        const tickers = state.stocks.slice(0, 5).map(s => s.ticker);
+        let html = `<table class="corr-table"><thead><tr><th></th>${tickers.map(t => `<th>${t}</th>`).join("")}</tr></thead><tbody>`;
+        tickers.forEach((t1, i) => {
+            html += `<tr><th>${t1}</th>`;
+            tickers.forEach((t2, j) => {
+                const corr = i === j ? 1.00 : +(0.2 + Math.random() * 0.65).toFixed(2);
+                const cls = corr >= 0.75 ? "corr-cell-high" : corr >= 0.5 ? "corr-cell-med" : "corr-cell-low";
+                html += `<td class="${cls}">${corr.toFixed(2)}</td>`;
+            });
+            html += `</tr>`;
+        });
+        html += `</tbody></table>`;
+        el.innerHTML = html;
+    },
+
+    renderCommentary() {
+        const el = document.getElementById("risk-commentary");
+        if (!el) return;
+        const comments = [
+            "Portfolio risk metrics are within acceptable institutional bounds. VaR is moderate, suggesting balanced positioning. The sector concentration in Banking warrants monitoring given rate sensitivity. Recommend adding Pharma or FMCG defensive positions to reduce cyclical exposure.",
+            "Drawdown analysis reveals elevated peak-to-trough losses in the Auto and Energy sectors. However, IT holdings exhibit strong risk-adjusted returns. Market beta is slightly above 1.0, indicating the portfolio will amplify broader market moves. Consider trimming high-beta names approaching resistance.",
+            "Overall risk profile is manageable. Liquidity is excellent given large-cap Nifty 50 focus. The primary tail risk is a global risk-off event driving FII outflows in excess of ₹20,000 Cr, which could compress multiples by 10–15%. Hedging with Nifty Put spreads is recommended for short-term protection.",
+        ];
+        el.innerHTML = comments[Math.floor(Math.random() * comments.length)];
+    }
+};
+
+// =====================================================================
+// MODULE: RESEARCH DESK
+// =====================================================================
+const researchDesk = {
+    reportData: {},
+    activeChart: null,
+
+    mockReports: {
+        thesis: [
+            "A high-quality compounder benefiting from structural tailwinds in India's growing economy. Strong management pedigree and consistent capital allocation make this a core holding for long-term portfolios.",
+            "A cyclical opportunity with improving return ratios. The business is at an inflection point where operating leverage will drive significant earnings expansion over the next 2-3 years.",
+            "A defensive growth story with pricing power and wide economic moat. Revenue visibility is high given long-term contracts and brand loyalty in its core markets.",
+        ],
+        bull: [
+            "Market share gains in underpenetrated segments, margin expansion from operating leverage, and a clean balance sheet provide significant upside. Export opportunities add an additional growth vector.",
+            "Accelerating capex cycle in core end-markets, govt policy tailwinds, and a premium valuation deserved given ROE expansion trajectory. Earnings CAGR of 20%+ is sustainable for 3+ years.",
+            "Asset quality improvement, strong deposit franchise, and digital banking investments creating a durable competitive moat. NIMs are at trough and expected to expand 30-50bps.",
+        ],
+        bear: [
+            "Execution risk on new business segments, competitive intensity from global players, and potential regulatory headwinds could compress multiples. Slowing global growth is a key watch item.",
+            "Input cost pressures, delayed project execution, and rising working capital could weigh on near-term margins. Valuation leaves limited margin of safety for negative surprises.",
+            "Elevated loan-to-deposit ratio, rising credit costs in unsecured segments, and macro slowdown could pressure earnings. FII selling on global risk-off remains a short-term headwind.",
+        ],
+    },
+
+    init() {
+        const list = document.getElementById("research-stock-list");
+        if (!list) return;
+        list.innerHTML = state.stocks.map(s => `
+            <div class="research-stock-item" data-ticker="${s.ticker}" onclick="researchDesk.loadReport('${s.ticker}')">
+                <div>
+                    <div style="font-weight:700;color:#fff">${s.ticker}</div>
+                    <div style="font-size:11px;color:var(--text-muted)">${s.name}</div>
+                </div>
+                <div style="text-align:right">
+                    <div style="font-size:12px;color:var(--accent-gold);font-weight:700">${s.totalAlpha}</div>
+                    <div style="font-size:10px;color:var(--text-muted)">Alpha</div>
+                </div>
+            </div>
+        `).join("");
+    },
+
+    loadReport(ticker) {
+        document.querySelectorAll(".research-stock-item").forEach(el => {
+            el.classList.toggle("active", el.dataset.ticker === ticker);
+        });
+        const panel = document.getElementById("research-report-panel");
+        const stock = state.stocks.find(s => s.ticker === ticker);
+        if (!stock || !panel) return;
+
+        panel.innerHTML = `<div class="skeleton-text"></div><div class="skeleton-text"></div><div class="skeleton-text short"></div>`;
+
+        const key = localStorage.getItem("RCCIITGV_GEMINI_KEY");
+        if (key) {
+            const prompt = `Write a concise institutional equity research note for ${ticker} (${stock.name}) listed on NSE India. Include: Investment Thesis (2 sentences), Bull Case (2 bullet points), Bear Case (2 bullet points), Valuation Commentary (1 sentence), and end with exactly: FUND_SCORE: XX where XX is 0-50.`;
+            fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
+                method: "POST", headers: {"Content-Type":"application/json"},
+                body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+            }).then(r => r.json()).then(d => {
+                const text = d.candidates[0].content.parts[0].text;
+                const scoreMatch = text.match(/FUND_SCORE:\s*(\d+)/i);
+                const score = scoreMatch ? parseInt(scoreMatch[1]) : stock.fundScore;
+                const body = text.replace(/FUND_SCORE:\s*\d+/i, "").replace(/\n\n/g, "</p><p>").replace(/\n/g, "<br>");
+                this.renderReport(panel, stock, score, `<p>${body}</p>`);
+            }).catch(() => this.renderMockReport(panel, stock));
+        } else {
+            setTimeout(() => this.renderMockReport(panel, stock), 600);
+        }
+    },
+
+    renderMockReport(panel, stock) {
+        const r = this.mockReports;
+        const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+        const peRatio = (15 + Math.random() * 25).toFixed(1);
+        const peVsMkt = (Math.random() > 0.5 ? "premium" : "discount") + " to sector median";
+        const score = stock.fundScore;
+        const content = `
+            <div class="report-section"><h4>Investment Thesis</h4><p>${pick(r.thesis)}</p></div>
+            <div class="report-section"><h4>Bull Case</h4><p>${pick(r.bull)}</p></div>
+            <div class="report-section"><h4>Bear Case</h4><p>${pick(r.bear)}</p></div>
+            <div class="report-section"><h4>Valuation</h4><p>Trading at ${peRatio}x forward P/E — a ${peVsMkt}. DCF fair value implies ${(Math.random() > 0.5 ? "upside" : "downside")} of ${(5 + Math.random() * 20).toFixed(0)}%.</p></div>
+        `;
+        this.renderReport(panel, stock, score, content);
+    },
+
+    renderReport(panel, stock, score, bodyHTML) {
+        const signalColor = stock.signal.includes("BUY") ? "var(--positive)" : stock.signal.includes("UNDER") ? "var(--negative)" : "var(--warning)";
+        panel.innerHTML = `
+            <div class="report-header">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                    <div>
+                        <div class="report-ticker">${stock.ticker}</div>
+                        <div class="report-name">${stock.name} · ${stock.sector}</div>
+                    </div>
+                    <div style="text-align:right">
+                        <div style="font-size:24px;font-weight:800;color:var(--accent-gold)">₹${stock.currentPrice.toFixed(0)}</div>
+                        <div style="color:${signalColor};font-size:12px;font-weight:700">${stock.signal}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="report-score-strip">
+                <div class="rscore"><div class="rscore-val" style="color:#58a6ff">${stock.techScore}</div><div class="rscore-lbl">Tech Score</div></div>
+                <div class="rscore"><div class="rscore-val" style="color:var(--accent-gold)">${score}</div><div class="rscore-lbl">Fund Score</div></div>
+                <div class="rscore"><div class="rscore-val" style="color:var(--positive)">${stock.techScore + score}</div><div class="rscore-lbl">Total Alpha</div></div>
+                <div class="rscore"><div class="rscore-val">${stock.indicators.rsi.toFixed(0)}</div><div class="rscore-lbl">RSI (14)</div></div>
+                <div class="rscore"><div class="rscore-val">${(stock.vol*100).toFixed(0)}%</div><div class="rscore-lbl">Volatility</div></div>
+            </div>
+            ${bodyHTML}
+            <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border-color);font-size:11px;color:var(--text-muted)">
+                ⚠️ Simulated research for educational purposes only. Not SEBI-registered investment advice.
+            </div>
+        `;
+    }
+};
+
+// =====================================================================
+// MODULE: BACKTESTER
+// =====================================================================
+const backtester = {
+    equityChart: null,
+
+    run() {
+        const capital = parseFloat(document.getElementById("bt-capital").value) || 10000000;
+        const threshold = parseFloat(document.getElementById("bt-threshold").value) || 60;
+        const holdDays = parseInt(document.getElementById("bt-holddays").value) || 20;
+        const maxPos = parseInt(document.getElementById("bt-maxpos").value) || 5;
+        const stopLoss = parseFloat(document.getElementById("bt-stoploss").value) / 100 || 0.08;
+
+        logActivity(`Running backtest: threshold=${threshold}, hold=${holdDays}d, capital=₹${(capital/1e7).toFixed(1)}Cr`);
+
+        // Select stocks that pass threshold
+        const candidates = state.stocks.filter(s => s.totalAlpha >= threshold);
+        const selected = candidates.slice(0, maxPos);
+
+        if (!selected.length) {
+            document.getElementById("backtest-results").innerHTML = `<div class="dashboard-panel" style="color:var(--warning);text-align:center;padding:40px">No stocks meet the alpha threshold of ${threshold}. Please lower the threshold.</div>`;
+            return;
+        }
+
+        // Simulate equity curve
+        const days = state.simDays;
+        let equity = [capital];
+        const trades = [];
+        const positionSize = capital / selected.length;
+
+        for (let d = holdDays; d < days; d += holdDays) {
+            let periodReturn = 0;
+            selected.forEach(stock => {
+                const atEntry = stock.prices[d - holdDays];
+                const atExit  = stock.prices[Math.min(d, stock.prices.length - 1)];
+                let ret = (atExit - atEntry) / atEntry;
+                // Apply stop loss
+                const minPrice = Math.min(...stock.prices.slice(d - holdDays, d));
+                if ((minPrice - atEntry) / atEntry < -stopLoss) ret = -stopLoss;
+                periodReturn += ret;
+                trades.push({
+                    ticker: stock.ticker,
+                    entryDay: d - holdDays,
+                    exitDay: d,
+                    ret: ret * 100,
+                    win: ret > 0
+                });
+            });
+            const avgRet = periodReturn / selected.length;
+            equity.push(equity[equity.length - 1] * (1 + avgRet));
+        }
+
+        // Metrics
+        const totalReturn = ((equity[equity.length - 1] - capital) / capital) * 100;
+        const cagr = (Math.pow(equity[equity.length - 1] / capital, 252 / days) - 1) * 100;
+        const returns = equity.slice(1).map((v, i) => (v - equity[i]) / equity[i]);
+        const meanRet = returns.reduce((a, b) => a + b, 0) / returns.length;
+        const stdRet = Math.sqrt(returns.reduce((a, b) => a + Math.pow(b - meanRet, 2), 0) / returns.length);
+        const sharpe = stdRet > 0 ? (meanRet / stdRet) * Math.sqrt(252 / holdDays) : 0;
+        let peak = 0, maxDD = 0;
+        equity.forEach(v => {
+            if (v > peak) peak = v;
+            const dd = (peak - v) / peak * 100;
+            if (dd > maxDD) maxDD = dd;
+        });
+        const winRate = trades.length ? (trades.filter(t => t.win).length / trades.length) * 100 : 0;
+
+        const colorOf = v => v >= 0 ? "var(--positive)" : "var(--negative)";
+        const signOf  = v => v >= 0 ? "+" : "";
+
+        const resultsEl = document.getElementById("backtest-results");
+        resultsEl.innerHTML = `
+            <div class="perf-strip">
+                <div class="perf-kpi"><div class="perf-kpi-val" style="color:${colorOf(totalReturn)}">${signOf(totalReturn)}${totalReturn.toFixed(1)}%</div><div class="perf-kpi-lbl">Total Return</div></div>
+                <div class="perf-kpi"><div class="perf-kpi-val" style="color:${colorOf(cagr)}">${signOf(cagr)}${cagr.toFixed(1)}%</div><div class="perf-kpi-lbl">CAGR</div></div>
+                <div class="perf-kpi"><div class="perf-kpi-val" style="color:${colorOf(sharpe)}">${sharpe.toFixed(2)}</div><div class="perf-kpi-lbl">Sharpe Ratio</div></div>
+                <div class="perf-kpi"><div class="perf-kpi-val" style="color:var(--negative)">-${maxDD.toFixed(1)}%</div><div class="perf-kpi-lbl">Max Drawdown</div></div>
+                <div class="perf-kpi"><div class="perf-kpi-val" style="color:${colorOf(winRate - 50)}">${winRate.toFixed(0)}%</div><div class="perf-kpi-lbl">Win Rate</div></div>
+                <div class="perf-kpi"><div class="perf-kpi-val">${trades.length}</div><div class="perf-kpi-lbl">Total Trades</div></div>
+            </div>
+            <div class="dashboard-panel" style="margin-bottom:0">
+                <h3 class="panel-title">📈 Equity Curve</h3>
+                <canvas id="bt-equity-chart" style="max-height:250px"></canvas>
+            </div>
+            <div class="dashboard-panel" style="margin-bottom:0">
+                <h3 class="panel-title">📋 Trade Log (last 10)</h3>
+                <table class="trade-log-table">
+                    <thead><tr><th>Stock</th><th>Entry Day</th><th>Exit Day</th><th>Return</th><th>Result</th></tr></thead>
+                    <tbody>
+                        ${trades.slice(-10).reverse().map(t => `
+                            <tr>
+                                <td><strong>${t.ticker}</strong></td>
+                                <td>Day ${t.entryDay}</td>
+                                <td>Day ${t.exitDay}</td>
+                                <td class="${t.win ? 'win' : 'loss'}">${signOf(t.ret)}${t.ret.toFixed(2)}%</td>
+                                <td class="${t.win ? 'win' : 'loss'}">${t.win ? "✅ WIN" : "❌ LOSS"}</td>
+                            </tr>
+                        `).join("")}
+                    </tbody>
+                </table>
+            </div>
+        `;
+
+        // Render equity chart
+        setTimeout(() => {
+            const ctx = document.getElementById("bt-equity-chart");
+            if (!ctx) return;
+            if (this.equityChart) this.equityChart.destroy();
+            this.equityChart = new Chart(ctx.getContext("2d"), {
+                type: "line",
+                data: {
+                    labels: equity.map((_, i) => `Period ${i}`),
+                    datasets: [
+                        {
+                            label: "Strategy", data: equity,
+                            borderColor: "var(--accent-gold)", backgroundColor: "rgba(226,183,20,0.08)",
+                            borderWidth: 2, pointRadius: 3, fill: true, tension: 0.3
+                        },
+                        {
+                            label: "Buy & Hold Nifty",
+                            data: equity.map((_, i) => capital * (1 + i * 0.003 + (Math.random() - 0.5) * 0.01)),
+                            borderColor: "#58a6ff", borderWidth: 1.5, borderDash: [5, 5], pointRadius: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: "#8b949e" } } },
+                    scales: {
+                        x: { ticks: { color: "#8b949e" }, grid: { color: "rgba(255,255,255,0.05)" } },
+                        y: { ticks: { color: "#8b949e", callback: v => "₹" + (v/1e7).toFixed(2) + "Cr" }, grid: { color: "rgba(255,255,255,0.05)" } }
+                    }
+                }
+            });
+        }, 50);
+    }
+};
+
+// =====================================================================
+// INIT ALL MODULES when screens are activated
+// =====================================================================
+function initScreenModules() {
+    document.querySelectorAll('.nav-item').forEach(el => {
+        el.addEventListener('click', () => {
+            const target = el.getAttribute('data-target');
+            setTimeout(() => {
+                if (target === 'ai-intelligence') aiDesk.init();
+                if (target === 'portfolio')       portfolioMgr.init();
+                if (target === 'risk-desk')       riskDesk.init();
+                if (target === 'research')        researchDesk.init();
+            }, 50);
+        });
+    });
+}
+
+window.onload = () => { app.init(); initScreenModules(); };
+    </script>
+</body>
+</html>

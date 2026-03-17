@@ -1,0 +1,30 @@
+# ============================================================
+# AI-Native Financial Research Engine — Phase 1 Dependencies
+# ============================================================
+
+# Market data (yfinance wraps Yahoo Finance for NSE/BSE tickers)
+yfinance>=0.2.36
+
+# Vector database (local, no server needed)
+chromadb>=0.5.0
+
+# HTTP requests (for any raw API calls)
+requests>=2.31.0
+
+# RSS feed parsing (for financial news)
+feedparser>=6.0.10
+
+# Environment variable management (.env support)
+python-dotenv>=1.0.0
+
+# Google Gen AI — the LLM backbone
+google-genai>=0.5.0
+
+# Data manipulation (used by yfinance output)
+pandas>=2.0.0
+
+# Optional: pretty console tables for debugging
+tabulate>=0.9.0
+
+# Dashboard UI (Phase 4)
+streamlit>=1.30.0

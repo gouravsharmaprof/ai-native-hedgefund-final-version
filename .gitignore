@@ -1,0 +1,9 @@
+# Git ignore — never commit secrets or generated data
+.env
+__pycache__/
+*.pyc
+chroma_db/
+stock_data.json
+news_data.json
+*.egg-info/
+.DS_Store
