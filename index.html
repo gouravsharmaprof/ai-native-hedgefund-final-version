@@ -2,8 +2,23 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>RCCIITGV | Systematic Alpha. Indian Markets.</title>
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="./manifest.json">
+
+    <!-- iOS PWA Support -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="RCCIITGV">
+    <link rel="apple-touch-icon" href="./icons/icon-192.png">
+
+    <!-- Android / Browser theme -->
+    <meta name="theme-color" content="#161b22">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="description" content="RCCIITGV Capital — AI-Native Hedge Fund Platform. Systematic Alpha. Indian Markets.">
+
     <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -373,9 +388,233 @@ body {
 .loss { color: var(--negative); }
 
 .placeholder-text { padding: 40px; color: var(--text-muted); font-size: 16px; }
+
+/* =====================================================
+   MOBILE / PWA RESPONSIVE STYLES
+   ===================================================== */
+
+/* Hamburger button — only shown on mobile */
+.hamburger-btn {
+    display: none;
+    position: fixed;
+    top: 16px; left: 16px;
+    width: 42px; height: 42px;
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    color: var(--text-main);
+    font-size: 18px;
+    cursor: pointer;
+    z-index: 500;
+    align-items: center; justify-content: center;
+    transition: background 0.2s;
+}
+.hamburger-btn:hover { background: var(--border-color); }
+
+/* Mobile sidebar overlay backdrop */
+.sidebar-overlay {
+    display: none;
+    position: fixed; top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.6);
+    z-index: 90;
+    backdrop-filter: blur(2px);
+}
+.sidebar-overlay.open { display: block; }
+
+/* Bottom Tab Bar — hidden on desktop */
+.bottom-nav {
+    display: none;
+    position: fixed; bottom: 0; left: 0; right: 0;
+    height: 60px;
+    background: var(--side-nav);
+    border-top: 1px solid var(--border-color);
+    z-index: 400;
+    align-items: center; justify-content: space-around;
+    padding: 0 4px;
+    /* Safe area for iPhone notch */
+    padding-bottom: env(safe-area-inset-bottom);
+}
+.bottom-tab {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    flex: 1; padding: 6px 4px;
+    color: var(--text-muted);
+    font-size: 10px; font-weight: 500;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: color 0.2s;
+    gap: 2px;
+    border: none; background: none;
+    letter-spacing: 0.2px;
+}
+.bottom-tab .tab-icon { font-size: 20px; }
+.bottom-tab.active { color: var(--accent-gold); }
+.bottom-tab span { white-space: nowrap; }
+
+/* PWA install banner */
+#pwa-install-banner {
+    display: none;
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--panel-bg);
+    border-top: 2px solid var(--accent-gold);
+    padding: 12px 16px;
+    z-index: 600;
+    align-items: center; justify-content: space-between;
+    gap: 12px;
+    font-size: 13px;
+}
+#pwa-install-banner.visible { display: flex; }
+.install-banner-text { flex: 1; color: var(--text-main); line-height: 1.4; }
+.install-banner-text strong { color: var(--accent-gold); }
+.install-btn { background: var(--accent-gold); color: var(--bg-darker); font-weight: 700; border: none; padding: 8px 16px; border-radius: 6px; font-size: 13px; cursor: pointer; white-space: nowrap; }
+.dismiss-btn { background: none; border: none; color: var(--text-muted); font-size: 18px; cursor: pointer; padding: 4px 8px; }
+
+@media (max-width: 768px) {
+    /* Show hamburger and bottom nav */
+    .hamburger-btn { display: flex; }
+    .bottom-nav { display: flex; }
+
+    /* Body layout: full width, add bottom padding for tab bar */
+    body { flex-direction: column; height: auto; overflow: auto; }
+
+    /* Sidebar becomes full-height overlay */
+    .sidebar {
+        position: fixed; top: 0; left: -280px; bottom: 0;
+        width: 260px; z-index: 100;
+        transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .sidebar.mobile-open { left: 0; }
+
+    /* Main content fills screen */
+    .main-content { width: 100%; min-height: 100vh; }
+
+    /* Top header — shift content right to clear hamburger */
+    .top-header { padding: 0 16px 0 64px; height: 60px; position: sticky; top: 0; z-index: 10; }
+    .top-header h2 { font-size: 16px; }
+
+    /* Screen content — add bottom padding for tab bar */
+    .screen-content { padding: 16px 16px 80px 16px; }
+
+    /* KPI cards: 2 per row on mobile */
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .kpi-value { font-size: 20px; }
+
+    /* Dashboard grid: single column */
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+    }
+    .panel-signal-dist, .panel-top-opp, .panel-activity, .panel-alerts {
+        grid-column: 1; grid-row: auto;
+    }
+    .signal-dist-grid { grid-template-columns: repeat(2, 1fr); }
+
+    /* AI desk — single column */
+    .ai-desk-grid { grid-template-columns: 1fr; }
+
+    /* Portfolio grid — single column */
+    .portfolio-grid { grid-template-columns: 1fr; }
+    .portfolio-kpi-strip { gap: 8px; }
+    .pkpi { min-width: 0; padding: 12px 14px; }
+    .pkpi-val { font-size: 17px; }
+
+    /* Stock cards grid — single column on very small, 2 on medium */
+    .stocks-grid { grid-template-columns: 1fr; }
+
+    /* Risk grid — 1 column */
+    .risk-grid { grid-template-columns: 1fr; }
+
+    /* Research layout — stacked */
+    .research-layout {
+        grid-template-columns: 1fr;
+        display: flex; flex-direction: column;
+        height: auto; overflow: visible;
+    }
+    .research-list { max-height: 220px; }
+    .research-report { height: auto; min-height: 300px; }
+
+    /* Backtest layout — stacked */
+    .backtest-layout { grid-template-columns: 1fr; }
+
+    /* Thematic grid — 2 per row */
+    .thematic-grid { grid-template-columns: repeat(2, 1fr); }
+
+    /* Tables — horizontally scrollable */
+    .holdings-table, .top-opp-table, .corr-table, .trade-log-table {
+        font-size: 11px;
+    }
+    table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+    /* Right drawer — full width on mobile */
+    .right-drawer { width: 100vw; right: -100vw; }
+
+    /* Add stock form wrap */
+    .add-stock-form { flex-wrap: wrap; }
+
+    /* Settings form — full width input */
+    .settings-form input { width: 100%; }
+
+    /* Filters bar */
+    .filters-bar { flex-direction: column; align-items: flex-start; gap: 10px; }
+}
+
+@media (min-width: 480px) and (max-width: 768px) {
+    .stocks-grid { grid-template-columns: repeat(2, 1fr); }
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* iOS safe area for content below top bar */
+@supports (padding-top: env(safe-area-inset-top)) {
+    .top-header {
+        padding-top: env(safe-area-inset-top);
+    }
+    .bottom-nav {
+        padding-bottom: calc(8px + env(safe-area-inset-bottom));
+        height: calc(60px + env(safe-area-inset-bottom));
+    }
+}
     </style>
 </head>
 <body>
+
+    <!-- MOBILE: Hamburger Button -->
+    <button class="hamburger-btn" id="hamburger-btn" aria-label="Open menu">☰</button>
+    <!-- MOBILE: Sidebar backdrop overlay -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- MOBILE: Bottom Navigation Bar -->
+    <nav class="bottom-nav" id="bottom-nav">
+        <button class="bottom-tab active" data-target="fund-overview">
+            <span class="tab-icon">📈</span>
+            <span>Overview</span>
+        </button>
+        <button class="bottom-tab" data-target="signal-engine">
+            <span class="tab-icon">📊</span>
+            <span>Signals</span>
+        </button>
+        <button class="bottom-tab" data-target="portfolio">
+            <span class="tab-icon">💼</span>
+            <span>Portfolio</span>
+        </button>
+        <button class="bottom-tab" data-target="ai-intelligence">
+            <span class="tab-icon">📡</span>
+            <span>AI Desk</span>
+        </button>
+        <button class="bottom-tab" data-target="research">
+            <span class="tab-icon">🔬</span>
+            <span>Research</span>
+        </button>
+    </nav>
+
+    <!-- PWA Install Banner (shown when installable) -->
+    <div id="pwa-install-banner">
+        <div class="install-banner-text">
+            📲 <strong>Install RCCIITGV Capital</strong> on your home screen for the full app experience
+        </div>
+        <button class="install-btn" id="pwa-install-btn">Install</button>
+        <button class="dismiss-btn" id="pwa-dismiss-btn">×</button>
+    </div>
 
     <!-- SIDEBAR -->
     <aside class="sidebar">
@@ -1734,7 +1973,108 @@ function initScreenModules() {
     });
 }
 
-window.onload = () => { app.init(); initScreenModules(); };
+window.onload = () => { app.init(); initScreenModules(); initMobileNav(); };
+    </script>
+
+    <script>
+    // =====================================================================
+    // MOBILE NAVIGATION
+    // =====================================================================
+    function initMobileNav() {
+        const hamburger = document.getElementById('hamburger-btn');
+        const sidebar = document.querySelector('.sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        const bottomNav = document.getElementById('bottom-nav');
+
+        function openSidebar() {
+            sidebar.classList.add('mobile-open');
+            overlay.classList.add('open');
+        }
+        function closeSidebar() {
+            sidebar.classList.remove('mobile-open');
+            overlay.classList.remove('open');
+        }
+
+        hamburger.addEventListener('click', () => {
+            sidebar.classList.contains('mobile-open') ? closeSidebar() : openSidebar();
+        });
+        overlay.addEventListener('click', closeSidebar);
+
+        // Close sidebar when a nav item is clicked on mobile
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                if (window.innerWidth <= 768) closeSidebar();
+                // Sync bottom nav active tab
+                const target = item.getAttribute('data-target');
+                syncBottomNav(target);
+            });
+        });
+
+        // Bottom tab navigation
+        bottomNav.querySelectorAll('.bottom-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const target = tab.getAttribute('data-target');
+                // Trigger the same logic as sidebar nav
+                const navItem = document.querySelector(`.nav-item[data-target="${target}"]`);
+                if (navItem) navItem.click();
+                syncBottomNav(target);
+            });
+        });
+    }
+
+    function syncBottomNav(target) {
+        document.querySelectorAll('.bottom-tab').forEach(t => {
+            t.classList.toggle('active', t.getAttribute('data-target') === target);
+        });
+    }
+
+    // =====================================================================
+    // SERVICE WORKER REGISTRATION
+    // =====================================================================
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('[PWA] Service Worker registered:', reg.scope))
+                .catch(err => console.warn('[PWA] Service Worker failed:', err));
+        });
+    }
+
+    // =====================================================================
+    // PWA INSTALL PROMPT
+    // =====================================================================
+    let deferredPrompt;
+    const installBanner = document.getElementById('pwa-install-banner');
+    const installBtn = document.getElementById('pwa-install-btn');
+    const dismissBtn = document.getElementById('pwa-dismiss-btn');
+
+    window.addEventListener('beforeinstallprompt', e => {
+        e.preventDefault();
+        deferredPrompt = e;
+        // Show install banner after 3 seconds
+        setTimeout(() => { installBanner.classList.add('visible'); }, 3000);
+    });
+
+    if (installBtn) {
+        installBtn.addEventListener('click', async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            console.log('[PWA] Install prompt outcome:', outcome);
+            deferredPrompt = null;
+            installBanner.classList.remove('visible');
+        });
+    }
+
+    if (dismissBtn) {
+        dismissBtn.addEventListener('click', () => {
+            installBanner.classList.remove('visible');
+        });
+    }
+
+    window.addEventListener('appinstalled', () => {
+        console.log('[PWA] App installed!');
+        installBanner.classList.remove('visible');
+    });
     </script>
 </body>
 </html>
